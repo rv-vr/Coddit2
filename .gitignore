@@ -1,0 +1,19 @@
+# Compiled class files
+*.class
+
+# NetBeans specific
+nbproject/private/
+build/
+dist/
+nbdist/
+.nb-gradle/
+
+# Package Files
+*.jar
+*.war
+*.ear
+*.zip
+
+# OS specific
+.DS_Store
+Thumbs.db
