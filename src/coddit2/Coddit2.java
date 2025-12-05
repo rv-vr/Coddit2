@@ -175,6 +175,7 @@ public class Coddit2 extends javax.swing.JFrame {
 
         getContentPane().add(RunBar, java.awt.BorderLayout.EAST);
 
+        HorizontalSep.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         HorizontalSep.setResizeWeight(0.3);
         HorizontalSep.setToolTipText("");
 
@@ -414,15 +415,20 @@ public class Coddit2 extends javax.swing.JFrame {
             OutputPane.setSelectedIndex(0);
             OutputTab.setText("Running " + file.getName() + "...\n\n");
             
-            // Run TASTE
-            String result = TASTE.run(file);
-            
-            try {
-                javax.swing.text.Document doc = OutputTab.getDocument();
-                doc.insertString(doc.getLength(), result, null);
-            } catch (javax.swing.text.BadLocationException e) {
-                e.printStackTrace();
-            }
+            // Delay execution to allow UI to update
+            javax.swing.Timer timer = new javax.swing.Timer(500, e -> {
+                // Run TASTE
+                String result = TASTE.run(file);
+                
+                try {
+                    javax.swing.text.Document doc = OutputTab.getDocument();
+                    doc.insertString(doc.getLength(), result, null);
+                } catch (javax.swing.text.BadLocationException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
         }
     }//GEN-LAST:event_RunCodeActionPerformed
 
