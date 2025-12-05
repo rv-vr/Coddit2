@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class TASTE {
+    // Theoretical Algorithm Structure Translation Engine
 
     // --- 1. Token Definitions ---
     public enum TokenType {
@@ -215,13 +216,22 @@ public class TASTE {
     }
 
     private void parseDecl() {
-        parseDatype(); 
+        TokenType type = parseDatype(); 
         Token nameToken = consume(TokenType.ID, "Expected ID");
         Object value = null;
         if (match(TokenType.ASSIGN)) {
             value = parseExpr();
         }
         if (shouldExecute) {
+            if (value != null) {
+                if (type == TokenType.KEY_CHUNK && value instanceof Number) {
+                    value = ((Number)value).intValue();
+                } else if (type == TokenType.KEY_SLURP && value instanceof Number) {
+                    value = ((Number)value).doubleValue();
+                } else if (type == TokenType.KEY_WRAP) {
+                    value = String.valueOf(value);
+                }
+            }
             variables.put(nameToken.value, value); 
         }
     }
@@ -363,10 +373,12 @@ public class TASTE {
         consume(TokenType.RBRACE, "Expected }");
     }
 
-    private void parseDatype() {
-        if (!match(TokenType.KEY_CHUNK, TokenType.KEY_SLURP, TokenType.KEY_WRAP, TokenType.KEY_TASTE)) {
-            throw new RuntimeException("Expected Data Type");
-        }
+    private TokenType parseDatype() {
+        if (match(TokenType.KEY_CHUNK)) return TokenType.KEY_CHUNK;
+        if (match(TokenType.KEY_SLURP)) return TokenType.KEY_SLURP;
+        if (match(TokenType.KEY_WRAP)) return TokenType.KEY_WRAP;
+        if (match(TokenType.KEY_TASTE)) return TokenType.KEY_TASTE;
+        throw new RuntimeException("Expected Data Type");
     }
 
     private Object parseExpr() {
@@ -414,10 +426,19 @@ public class TASTE {
             Object right = parseTerm();
             if (shouldExecute) {
                 if (op.type == TokenType.OP_ADD) {
-                    if (left instanceof String || right instanceof String) return left.toString() + right.toString();
-                    return ((Number)left).doubleValue() + ((Number)right).doubleValue();
+                    if (left instanceof String || right instanceof String) {
+                        left = left.toString() + right.toString();
+                    } else if (left instanceof Integer && right instanceof Integer) {
+                        left = (Integer)left + (Integer)right;
+                    } else {
+                        left = ((Number)left).doubleValue() + ((Number)right).doubleValue();
+                    }
                 } else {
-                    return ((Number)left).doubleValue() - ((Number)right).doubleValue();
+                    if (left instanceof Integer && right instanceof Integer) {
+                        left = (Integer)left - (Integer)right;
+                    } else {
+                        left = ((Number)left).doubleValue() - ((Number)right).doubleValue();
+                    }
                 }
             }
         }
@@ -430,16 +451,40 @@ public class TASTE {
             Token op = tokens.get(current - 1); 
             Object right = parseFactor();
             if (shouldExecute) {
-                if (op.type == TokenType.OP_MULT) return ((Number)left).doubleValue() * ((Number)right).doubleValue();
-                else if (op.type == TokenType.OP_DIV) return ((Number)left).doubleValue() / ((Number)right).doubleValue();
-                else return ((Number)left).doubleValue() % ((Number)right).doubleValue(); 
+                if (op.type == TokenType.OP_MULT) {
+                    if (left instanceof Integer && right instanceof Integer) {
+                        left = (Integer)left * (Integer)right;
+                    } else {
+                        left = ((Number)left).doubleValue() * ((Number)right).doubleValue();
+                    }
+                } else if (op.type == TokenType.OP_DIV) {
+                    if (left instanceof Integer && right instanceof Integer) {
+                        left = (Integer)left / (Integer)right;
+                    } else {
+                        left = ((Number)left).doubleValue() / ((Number)right).doubleValue();
+                    }
+                } else {
+                    if (left instanceof Integer && right instanceof Integer) {
+                        left = (Integer)left % (Integer)right;
+                    } else {
+                        left = ((Number)left).doubleValue() % ((Number)right).doubleValue();
+                    }
+                }
             }
         }
         return left;
     }
 
     private Object parseFactor() {
-        if (match(TokenType.LPAREN)) {
+        if (match(TokenType.OP_SUB)) {
+            Object val = parseFactor();
+            if (shouldExecute) {
+                if (val instanceof Integer) return -(Integer)val;
+                if (val instanceof Double) return -(Double)val;
+                throw new RuntimeException("Unary minus only applies to numbers");
+            }
+            return 0;
+        } else if (match(TokenType.LPAREN)) {
             Object val = parseExpr();
             consume(TokenType.RPAREN, "Expected )");
             return val;

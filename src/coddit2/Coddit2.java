@@ -37,6 +37,31 @@ public class Coddit2 extends javax.swing.JFrame {
         // Initialize Search Bar
         createSearchBar();
         
+        // Setup Undo/Redo in Edit Menu
+        javax.swing.JMenuItem undoItem = new javax.swing.JMenuItem("Undo");
+        undoItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        undoItem.addActionListener(e -> {
+            javax.swing.text.JTextComponent textArea = getCurrentTextArea();
+            if (textArea != null) {
+                javax.swing.undo.UndoManager um = (javax.swing.undo.UndoManager) textArea.getClientProperty("undoManager");
+                if (um != null && um.canUndo()) um.undo();
+            }
+        });
+        
+        javax.swing.JMenuItem redoItem = new javax.swing.JMenuItem("Redo");
+        redoItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        redoItem.addActionListener(e -> {
+            javax.swing.text.JTextComponent textArea = getCurrentTextArea();
+            if (textArea != null) {
+                javax.swing.undo.UndoManager um = (javax.swing.undo.UndoManager) textArea.getClientProperty("undoManager");
+                if (um != null && um.canRedo()) um.redo();
+            }
+        });
+        
+        EditMenu.add(undoItem, 0);
+        EditMenu.add(redoItem, 1);
+        EditMenu.add(new javax.swing.JPopupMenu.Separator(), 2);
+        
         // Initialize File Tree
         setupFileTree();
 
@@ -855,6 +880,35 @@ public class Coddit2 extends javax.swing.JFrame {
         textArea.getDocument().addDocumentListener(highlighter);
         highlighter.highlight(); // Initial highlight
         
+        // Undo/Redo
+        javax.swing.undo.UndoManager undoManager = new javax.swing.undo.UndoManager();
+        textArea.putClientProperty("undoManager", undoManager);
+        textArea.getDocument().addUndoableEditListener(e -> {
+            if (e.getEdit() instanceof javax.swing.event.DocumentEvent) {
+                javax.swing.event.DocumentEvent de = (javax.swing.event.DocumentEvent) e.getEdit();
+                if (de.getType() == javax.swing.event.DocumentEvent.EventType.CHANGE) {
+                    return;
+                }
+            }
+            undoManager.addEdit(e.getEdit());
+        });
+        
+        textArea.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("control Z"), "Undo");
+        textArea.getActionMap().put("Undo", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (undoManager.canUndo()) undoManager.undo();
+            }
+        });
+        
+        textArea.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("control Y"), "Redo");
+        textArea.getActionMap().put("Redo", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (undoManager.canRedo()) undoManager.redo();
+            }
+        });
+
         // Listener to update line numbers
         textArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             private int lastLineCount = 0;
