@@ -15,6 +15,8 @@ import taste.TASTE;
 public class Coddit2 extends javax.swing.JFrame {
 
     private java.io.File currentProjectFolder;
+    private ConfigManager configManager;
+    private javax.swing.JMenu openRecentMenu;
 
     // Search Bar Components
     private javax.swing.JPanel SearchBar;
@@ -32,6 +34,20 @@ public class Coddit2 extends javax.swing.JFrame {
      */
     public Coddit2() {
         initComponents();
+        
+        configManager = new ConfigManager();
+        setupRecentMenu();
+        
+        // Check for first instance and load last project
+        if (configManager.acquireInstanceLock()) {
+            String lastProj = configManager.getLastProject();
+            if (lastProj != null) {
+                java.io.File projFile = new java.io.File(lastProj);
+                if (projFile.exists()) {
+                    updateFileTree(projFile);
+                }
+            }
+        }
         
         // Initialize Search Bar
         createSearchBar();
@@ -175,7 +191,6 @@ public class Coddit2 extends javax.swing.JFrame {
 
         getContentPane().add(RunBar, java.awt.BorderLayout.EAST);
 
-        HorizontalSep.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         HorizontalSep.setResizeWeight(0.3);
         HorizontalSep.setToolTipText("");
 
@@ -204,6 +219,7 @@ public class Coddit2 extends javax.swing.JFrame {
 
         VerticalSep1.setRightComponent(OutputPane);
 
+        EditorTabs.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         EditorTabs.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         EditorTabs.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -327,6 +343,8 @@ public class Coddit2 extends javax.swing.JFrame {
         java.io.File folder = FileHandler.openDirectoryChooser(this);
         if (folder != null) {
             updateFileTree(folder);
+            configManager.addRecentProject(folder.getAbsolutePath());
+            updateRecentMenu();
         }
     }//GEN-LAST:event_OpenProjActionPerformed
 
@@ -435,23 +453,40 @@ public class Coddit2 extends javax.swing.JFrame {
     private void StopCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StopCodeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_StopCodeActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
      
+    private void setupRecentMenu() {
+        openRecentMenu = new javax.swing.JMenu("Open Recent");
+        openRecentMenu.setFont(new java.awt.Font("Roboto", 0, 12));
+        FileMenu.add(openRecentMenu, 2); // Insert after Open Project
+        updateRecentMenu();
+    }
+
+    private void updateRecentMenu() {
+        openRecentMenu.removeAll();
+        java.util.List<String> recent = configManager.getRecentProjects();
+        if (recent.isEmpty()) {
+            javax.swing.JMenuItem item = new javax.swing.JMenuItem("No Recent Projects");
+            item.setEnabled(false);
+            openRecentMenu.add(item);
+        } else {
+            for (String path : recent) {
+                javax.swing.JMenuItem item = new javax.swing.JMenuItem(path);
+                item.setFont(new java.awt.Font("Roboto", 0, 12));
+                item.addActionListener(e -> {
+                    java.io.File folder = new java.io.File(path);
+                    if (folder.exists()) {
+                        updateFileTree(folder);
+                        configManager.addRecentProject(path);
+                        updateRecentMenu();
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Project directory not found.");
+                    }
+                });
+                openRecentMenu.add(item);
+            }
+        }
+    }
+
     private void createSearchBar() {
         SearchBar = new javax.swing.JPanel();
         SearchBar.setLayout(new java.awt.BorderLayout());
@@ -570,14 +605,17 @@ public class Coddit2 extends javax.swing.JFrame {
         
         FileTree.expandRow(0);
         FileTree.validate();
-        java.awt.Dimension treeSize = FileTree.getPreferredSize();
-        int newDividerLocation = treeSize.width + 64;
-        int maxWidth = 300; 
-        if (newDividerLocation > maxWidth) {
-            newDividerLocation = maxWidth;
-        }
         
-        HorizontalSep.setDividerLocation(newDividerLocation);
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            java.awt.Dimension treeSize = FileTree.getPreferredSize();
+            int newDividerLocation = treeSize.width + 64;
+            int maxWidth = 300; 
+            if (newDividerLocation > maxWidth) {
+                newDividerLocation = maxWidth;
+            }
+            
+            HorizontalSep.setDividerLocation(newDividerLocation);
+        });
     }
 
     void createNewFile() {
