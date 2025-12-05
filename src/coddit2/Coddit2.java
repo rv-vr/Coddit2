@@ -4,7 +4,6 @@
  */
 package coddit2;
 import com.formdev.flatlaf.*;
-import java.awt.Font;
 import javax.swing.*;
 import taste.TASTE;
 
@@ -106,6 +105,7 @@ public class Coddit2 extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         OutputTab = new javax.swing.JEditorPane();
         jScrollPane4 = new javax.swing.JScrollPane();
+        TerminalTab = new javax.swing.JEditorPane();
         EditorTabs = new javax.swing.JTabbedPane();
         FileTreeScroll = new javax.swing.JScrollPane();
         FileTree = new javax.swing.JTree();
@@ -196,6 +196,10 @@ public class Coddit2 extends javax.swing.JFrame {
         jScrollPane3.setViewportView(OutputTab);
 
         OutputPane.addTab("Output", jScrollPane3);
+
+        jScrollPane4.setViewportView(TerminalTab);
+
+        OutputPane.addTab("Terminal", jScrollPane4);
 
         VerticalSep1.setRightComponent(OutputPane);
 
@@ -444,7 +448,9 @@ public class Coddit2 extends javax.swing.JFrame {
      
     private void createSearchBar() {
         SearchBar = new javax.swing.JPanel();
-        SearchBar.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        SearchBar.setLayout(new java.awt.BorderLayout());
+        
+        javax.swing.JPanel controlsPanel = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         
         SearchField = new javax.swing.JTextField(15);
         ReplaceField = new javax.swing.JTextField(15);
@@ -453,23 +459,48 @@ public class Coddit2 extends javax.swing.JFrame {
         FindPrevBtn = new javax.swing.JButton("Prev");
         ReplaceBtn = new javax.swing.JButton("Replace");
         ReplaceAllBtn = new javax.swing.JButton("Replace All");
-        CloseSearchBtn = new javax.swing.JButton("X");
+        
+        CloseSearchBtn = new javax.swing.JButton("\uE711");
+        CloseSearchBtn.setFont(new java.awt.Font("Segoe MDL2 Assets", java.awt.Font.PLAIN, 12));
+        CloseSearchBtn.setBorderPainted(false);
+        CloseSearchBtn.setContentAreaFilled(false);
+        CloseSearchBtn.setFocusable(false);
+        CloseSearchBtn.setMargin(new java.awt.Insets(5, 10, 5, 10));
+        CloseSearchBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        CloseSearchBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                CloseSearchBtn.setContentAreaFilled(true);
+                CloseSearchBtn.setBackground(new java.awt.Color(242, 242, 242));
+                CloseSearchBtn.setForeground(java.awt.Color.WHITE);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                CloseSearchBtn.setContentAreaFilled(false);
+                CloseSearchBtn.setForeground(javax.swing.UIManager.getColor("Button.foreground"));
+            }
+        });
+        
         ReplaceLabel = new javax.swing.JLabel("Replace:");
         
         // Add components
-        SearchBar.add(new javax.swing.JLabel("Find:"));
-        SearchBar.add(SearchField);
-        SearchBar.add(FindNextBtn);
-        SearchBar.add(FindPrevBtn);
+        controlsPanel.add(new javax.swing.JLabel("Find:"));
+        controlsPanel.add(SearchField);
+        controlsPanel.add(FindNextBtn);
+        controlsPanel.add(FindPrevBtn);
         
-        SearchBar.add(ReplaceLabel);
-        SearchBar.add(ReplaceField);
-        SearchBar.add(ReplaceBtn);
-        SearchBar.add(ReplaceAllBtn);
-        SearchBar.add(CloseSearchBtn);
+        controlsPanel.add(ReplaceLabel);
+        controlsPanel.add(ReplaceField);
+        controlsPanel.add(ReplaceBtn);
+        controlsPanel.add(ReplaceAllBtn);
+        
+        SearchBar.add(controlsPanel, java.awt.BorderLayout.CENTER);
+        SearchBar.add(CloseSearchBtn, java.awt.BorderLayout.EAST);
         
         // Add to frame
-        getContentPane().add(SearchBar, java.awt.BorderLayout.SOUTH);
+        javax.swing.JPanel editorContainer = new javax.swing.JPanel(new java.awt.BorderLayout());
+        editorContainer.add(EditorTabs, java.awt.BorderLayout.CENTER);
+        editorContainer.add(SearchBar, java.awt.BorderLayout.SOUTH);
+        VerticalSep1.setTopComponent(editorContainer);
+        
         SearchBar.setVisible(false);
         
         // Listeners
@@ -492,78 +523,19 @@ public class Coddit2 extends javax.swing.JFrame {
     }
 
     private void findNext() {
-        javax.swing.text.JTextComponent textArea = getCurrentTextArea();
-        if (textArea == null) return;
-        
-        String text = textArea.getText();
-        String search = SearchField.getText();
-        if (search.isEmpty()) return;
-        
-        int caret = textArea.getCaretPosition();
-        int index = text.indexOf(search, caret);
-        if (index == -1) {
-            // Wrap around
-            index = text.indexOf(search, 0);
-        }
-        
-        if (index != -1) {
-            textArea.select(index, index + search.length());
-            textArea.grabFocus();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Text not found");
-        }
+        SearchEngine.findNext(getCurrentTextArea(), SearchField.getText());
     }
 
     private void findPrev() {
-        javax.swing.text.JTextComponent textArea = getCurrentTextArea();
-        if (textArea == null) return;
-        
-        String text = textArea.getText();
-        String search = SearchField.getText();
-        if (search.isEmpty()) return;
-        
-        int caret = textArea.getSelectionStart();
-        // Search backwards from caret - 1
-        int index = text.lastIndexOf(search, caret - 1);
-        if (index == -1) {
-            // Wrap around to end
-            index = text.lastIndexOf(search);
-        }
-        
-        if (index != -1) {
-            textArea.select(index, index + search.length());
-            textArea.grabFocus();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Text not found");
-        }
+        SearchEngine.findPrev(getCurrentTextArea(), SearchField.getText());
     }
 
     private void replace() {
-        javax.swing.text.JTextComponent textArea = getCurrentTextArea();
-        if (textArea == null) return;
-        
-        String selection = textArea.getSelectedText();
-        String search = SearchField.getText();
-        
-        if (selection != null && selection.equals(search)) {
-            textArea.replaceSelection(ReplaceField.getText());
-            findNext();
-        } else {
-            findNext();
-        }
+        SearchEngine.replace(getCurrentTextArea(), SearchField.getText(), ReplaceField.getText());
     }
 
     private void replaceAll() {
-        javax.swing.text.JTextComponent textArea = getCurrentTextArea();
-        if (textArea == null) return;
-        
-        String search = SearchField.getText();
-        String replace = ReplaceField.getText();
-        if (search.isEmpty()) return;
-        
-        String text = textArea.getText();
-        String newText = text.replace(search, replace);
-        textArea.setText(newText);
+        SearchEngine.replaceAll(getCurrentTextArea(), SearchField.getText(), ReplaceField.getText());
     }
 
     private void setupFileTree() {
@@ -581,57 +553,7 @@ public class Coddit2 extends javax.swing.JFrame {
             }
         });
 
-        FileTree.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
-                if (javax.swing.SwingUtilities.isRightMouseButton(e)) {
-                    int row = FileTree.getClosestRowForLocation(e.getX(), e.getY());
-                    FileTree.setSelectionRow(row);
-                    showPopupMenu(e);
-                }
-            }
-
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
-                    javax.swing.tree.TreePath path = FileTree.getPathForLocation(evt.getX(), evt.getY());
-                    if (path != null) {
-                        javax.swing.tree.DefaultMutableTreeNode node = (javax.swing.tree.DefaultMutableTreeNode) path.getLastPathComponent();
-                        Object userObject = node.getUserObject();
-                        if (userObject instanceof java.io.File) {
-                            java.io.File file = (java.io.File) userObject;
-                            if (file.isFile()) {
-                                openFileInTab(file);
-                            }
-                        }
-                    }
-                }
-            }
-            
-            private void showPopupMenu(java.awt.event.MouseEvent e) {
-                javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
-                
-                javax.swing.JMenuItem newItem = new javax.swing.JMenuItem("New File");
-                newItem.addActionListener(evt -> createNewFile());
-                popup.add(newItem);
-                
-                javax.swing.JMenuItem deleteItem = new javax.swing.JMenuItem("Delete");
-                deleteItem.addActionListener(evt -> deleteFile());
-                popup.add(deleteItem);
-                
-                popup.addSeparator();
-                
-                javax.swing.JMenuItem refreshItem = new javax.swing.JMenuItem("Refresh");
-                refreshItem.addActionListener(evt -> {
-                    if (currentProjectFolder != null) {
-                        updateFileTree(currentProjectFolder);
-                    }
-                });
-                popup.add(refreshItem);
-                
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        });
+        FileTree.addMouseListener(new FileTreeMouseListener(this, FileTree));
     }
 
     private void updateFileTree(java.io.File folder) {
@@ -652,7 +574,7 @@ public class Coddit2 extends javax.swing.JFrame {
         HorizontalSep.setDividerLocation(newDividerLocation);
     }
 
-    private void createNewFile() {
+    void createNewFile() {
         javax.swing.tree.TreePath path = FileTree.getSelectionPath();
         if (path == null) return;
         
@@ -677,7 +599,7 @@ public class Coddit2 extends javax.swing.JFrame {
         }
     }
 
-    private void deleteFile() {
+    void deleteFile() {
         javax.swing.tree.TreePath path = FileTree.getSelectionPath();
         if (path == null) return;
         
@@ -707,13 +629,19 @@ public class Coddit2 extends javax.swing.JFrame {
         return file.delete();
     }
 
-    private void openFileInTab(java.io.File file) {
+    void refreshFileTree() {
+        if (currentProjectFolder != null) {
+            updateFileTree(currentProjectFolder);
+        }
+    }
+
+    void openFileInTab(java.io.File file) {
         // Check if file is already open
         for (int i = 0; i < EditorTabs.getTabCount(); i++) {
             java.awt.Component comp = EditorTabs.getComponentAt(i);
-            if (comp instanceof javax.swing.JScrollPane) {
-                javax.swing.JScrollPane scroll = (javax.swing.JScrollPane) comp;
-                javax.swing.text.JTextComponent text = (javax.swing.text.JTextComponent) scroll.getViewport().getView();
+            if (comp instanceof CodeEditor) {
+                CodeEditor editor = (CodeEditor) comp;
+                javax.swing.text.JTextComponent text = editor.getTextPane();
                 java.io.File openFile = (java.io.File) text.getClientProperty("file");
                 if (openFile != null && openFile.equals(file)) {
                     EditorTabs.setSelectedIndex(i);
@@ -754,12 +682,8 @@ public class Coddit2 extends javax.swing.JFrame {
 
     private javax.swing.text.JTextComponent getCurrentTextArea() {
         java.awt.Component selected = EditorTabs.getSelectedComponent();
-        if (selected instanceof javax.swing.JScrollPane) {
-            javax.swing.JScrollPane scrollPane = (javax.swing.JScrollPane) selected;
-            java.awt.Component view = scrollPane.getViewport().getView();
-            if (view instanceof javax.swing.text.JTextComponent) {
-                return (javax.swing.text.JTextComponent) view;
-            }
+        if (selected instanceof CodeEditor) {
+            return ((CodeEditor) selected).getTextPane();
         }
         return null;
     }
@@ -767,9 +691,9 @@ public class Coddit2 extends javax.swing.JFrame {
     private void setTabTitleBold(javax.swing.text.JTextComponent textArea, boolean bold) {
         for (int i = 0; i < EditorTabs.getTabCount(); i++) {
             java.awt.Component comp = EditorTabs.getComponentAt(i);
-            if (comp instanceof javax.swing.JScrollPane) {
-                javax.swing.JScrollPane scroll = (javax.swing.JScrollPane) comp;
-                if (scroll.getViewport().getView() == textArea) {
+            if (comp instanceof CodeEditor) {
+                CodeEditor editor = (CodeEditor) comp;
+                if (editor.getTextPane() == textArea) {
                     java.awt.Component tabComp = EditorTabs.getTabComponentAt(i);
                     if (tabComp instanceof javax.swing.JPanel) {
                         javax.swing.JPanel panel = (javax.swing.JPanel) tabComp;
@@ -860,103 +784,26 @@ public class Coddit2 extends javax.swing.JFrame {
     }
 
     private void createNewTab(String title, String content, java.io.File file) {
-        javax.swing.JTextPane textArea = new javax.swing.JTextPane();
-        textArea.setText(content);
+        CodeEditor editor = new CodeEditor(content);
+        javax.swing.JTextPane textArea = editor.getTextPane();
+        
         if (file != null) {
             textArea.putClientProperty("file", file);
         }
         
-        javax.swing.JTextArea lines = new javax.swing.JTextArea("1");
-        
-        lines.setBackground(java.awt.Color.LIGHT_GRAY);
-        lines.setEditable(false);
-        textArea.setFont(new Font("JetBrains Mono", Font.PLAIN, 12)); // Match font
-        lines.setFont(new Font("JetBrains Mono", Font.PLAIN, 12)); // Match font
-        lines.setMargin(new java.awt.Insets(0, 5, 0, 5)); // Add some padding
-        textArea.setMargin(new java.awt.Insets(0, 5, 0, 5)); // Add some padding
-        
-        // Add Syntax Highlighter
-        TasteHighlighter highlighter = new TasteHighlighter(textArea);
-        textArea.getDocument().addDocumentListener(highlighter);
-        highlighter.highlight(); // Initial highlight
-        
-        // Undo/Redo
-        javax.swing.undo.UndoManager undoManager = new javax.swing.undo.UndoManager();
-        textArea.putClientProperty("undoManager", undoManager);
-        textArea.getDocument().addUndoableEditListener(e -> {
-            if (e.getEdit() instanceof javax.swing.event.DocumentEvent) {
-                javax.swing.event.DocumentEvent de = (javax.swing.event.DocumentEvent) e.getEdit();
-                if (de.getType() == javax.swing.event.DocumentEvent.EventType.CHANGE) {
-                    return;
-                }
-            }
-            undoManager.addEdit(e.getEdit());
-        });
-        
-        textArea.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("control Z"), "Undo");
-        textArea.getActionMap().put("Undo", new javax.swing.AbstractAction() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                if (undoManager.canUndo()) undoManager.undo();
-            }
-        });
-        
-        textArea.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("control Y"), "Redo");
-        textArea.getActionMap().put("Redo", new javax.swing.AbstractAction() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                if (undoManager.canRedo()) undoManager.redo();
-            }
-        });
-
-        // Listener to update line numbers
+        // Listener to update tab title bold state
         textArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            private int lastLineCount = 0;
-            
-            private void updateLineNumbers() {
-                javax.swing.text.Element root = textArea.getDocument().getDefaultRootElement();
-                int lineCount = root.getElementCount();
-                
-                if (lineCount != lastLineCount) {
-                    StringBuilder text = new StringBuilder();
-                    for(int i = 1; i <= lineCount; i++) {
-                        text.append(i).append(System.getProperty("line.separator"));
-                    }
-                    lines.setText(text.toString());
-                    lastLineCount = lineCount;
-                }
-            }
-            @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent de) {
-                updateLineNumbers();
-                setTabTitleBold(textArea, true);
-            }
-            @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent de) {
-                updateLineNumbers();
-                setTabTitleBold(textArea, true);
-            }
-            @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent de) {
-                updateLineNumbers();
-                setTabTitleBold(textArea, true);
-            }
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent de) { setTabTitleBold(textArea, true); }
+            @Override public void insertUpdate(javax.swing.event.DocumentEvent de) { setTabTitleBold(textArea, true); }
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent de) { setTabTitleBold(textArea, true); }
         });
         
-        // Initial line number update for loaded content
-        if (!content.isEmpty()) {
-             // Trigger update manually or let the listener handle it if setText fires events (it does)
-        }
+        EditorTabs.addTab(title, editor);
         
-        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
-        scrollPane.setRowHeaderView(lines); // Add line numbers to the left
-        
-        EditorTabs.addTab(title, scrollPane);
-        
-        int index = EditorTabs.indexOfComponent(scrollPane);
+        int index = EditorTabs.indexOfComponent(editor);
         EditorTabs.setTabComponentAt(index, createTabTitlePanel(title));
         
-        EditorTabs.setSelectedComponent(scrollPane);
+        EditorTabs.setSelectedComponent(editor);
     }
 
     /**
@@ -1020,6 +867,7 @@ public class Coddit2 extends javax.swing.JFrame {
     private javax.swing.JMenuItem SaveFile;
     private javax.swing.JMenuItem SaveFileAs;
     private javax.swing.JButton StopCode;
+    private javax.swing.JEditorPane TerminalTab;
     private javax.swing.JSplitPane VerticalSep1;
     private javax.swing.JMenuBar WindowMenu;
     private javax.swing.Box.Filler filler1;
