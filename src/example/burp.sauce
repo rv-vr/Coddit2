@@ -1,1 +1,6 @@
 burp "Hey"
+
+chew(burger){burp"Yum"}spit{burp "Yuck"}
+
+
+

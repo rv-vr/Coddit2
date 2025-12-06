@@ -1,0 +1,77 @@
+// ==========================================
+// TEST PHASE 1: PREP & TYPES
+// Testing comments, variable declarations, and types.
+// ==========================================
+
+grab Chunk bun_count = 10
+grab Slurp sauce_ratio = 5.5
+grab Wrap chef_name = "Gordon"
+grab Taste is_kitchen_open = Yum
+grab Taste is_rat_present = Yuck
+
+burp("--- PHASE 1 COMPLETE ---")
+burp("Chef: " + chef_name)
+
+// ==========================================
+// TEST PHASE 2: MIXING (MATH & STRINGS)
+// Testing arithmetic and string concatenation
+// ==========================================
+
+grab Chunk extra_buns = 2
+grab Slurp reduced_sauce = 2.5
+
+// Test: Integer Math
+bun_count = bun_count + extra_buns 
+burp("Total Buns (Should be 12): " + bun_count)
+
+// Test: Float Math
+sauce_ratio = sauce_ratio - reduced_sauce
+burp("Sauce Ratio (Should be 3.0): " + sauce_ratio)
+
+// Test: The "Soup" Mix (String + Number)
+// Does your language auto-convert the number to text here?
+grab Wrap status = "Buns available: " + bun_count
+burp(status)
+
+burp("--- PHASE 2 COMPLETE ---")
+
+// ==========================================
+// TEST PHASE 3: THE TASTE TEST (LOGIC)
+// Testing chew, nibble, spit, and nesting
+// ==========================================
+
+// Scenario: We have 12 buns.
+chew (bun_count > 20) {
+    burp("FAIL: Logic error. 12 is not > 20.")
+} 
+nibble (bun_count == 12) {
+    burp("PASS: First level logic works.")
+    
+    // NESTING TEST
+    chew (is_rat_present == Yum) {
+        burp("CRITICAL FAIL: Who let the rat in?")
+    } 
+    spit {
+        burp("PASS: Nested logic works. Kitchen is clean.")
+    }
+
+} 
+spit {
+    burp("FAIL: Should have caught the nibble.")
+}
+
+burp("--- PHASE 3 COMPLETE ---")
+
+// ==========================================
+// TEST PHASE 4: THE WRONG ORDER (ERRORS)
+// Uncomment these lines one by one to test your Error Handling!
+// ==========================================
+
+// Test 1: Undefined Variable
+// burp(spaghetti)
+
+// Test 2: Division by Zero
+grab Chunk chaos = 10 / 0
+
+// Test 3: Type Mismatch (Math with Text)
+// grab Chunk weird = 10 - "Sandwich"

@@ -1,0 +1,53 @@
+// ==========================================
+// HELL'S KITCHEN (Error Showcase)
+// Uncomment lines one by one to see the errors!
+// ==========================================
+
+// 1. LEXICAL INDIGESTION (Unknown Character)
+// grab Chunk garbage = @
+
+// 2. MISSING INGREDIENT (Undefined Variable)
+// burp(lamb_sauce)
+
+// 3. BAD RECIPE MIX (Type Mismatch - Math)
+// grab Chunk weird = 10 - "Sandwich"
+
+// 4. UNARY MINUS ON NON-NUMBER
+// grab Wrap text = -"Hello"
+
+// 5. MISSING SAUCE (Expected '=')
+// grab Chunk buns 10
+
+// 6. MISSING ID (Expected Identifier)
+// grab Chunk = 5
+
+// 7. MISSING CHEW (Expected 'chew' for if)
+// if (Yum) {}
+
+// 8. NIBBLE WITHOUT CHEW (Else If without If)
+// nibble (Yum) {}
+
+// 9. SPIT WITHOUT CHEW (Else without If)
+// spit {}
+
+// 10. MISSING BURP (Expected 'burp' for print)
+// print("Hello")
+
+// 11. MISSING SWALLOW (Expected 'swallow' for input)
+// input(name)
+
+// 12. OPEN LUNCHBOX (Expected '{')
+// chew (Yum) burp("No brace")
+
+// 13. CLOSE LUNCHBOX (Expected '}')
+// chew (Yum) { burp("No closing brace")
+
+// 14. UNKNOWN FLAVOR (Unexpected Token)
+// grab Chunk x = 5
+// x 5
+
+// 15. EMPTY PLATE (Expected Value)
+ grab Chunk x = 
+
+// 16. WRONG FOOD TYPE (Expected Data Type)
+// grab Pizza x = 5

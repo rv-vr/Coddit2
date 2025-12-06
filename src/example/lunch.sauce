@@ -1,2 +1,2 @@
-Chunk num = 5 + 5 - 2 * 8 / 4
-burp "{num}"
+Wrap mark = "Vincent"
+burp 10 - "Burger"
