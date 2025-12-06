@@ -35,6 +35,9 @@ public class Coddit2 extends javax.swing.JFrame {
     public Coddit2() {
         initComponents();
         
+        // Add padding to the main window content pane
+        ((javax.swing.JComponent) getContentPane()).setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        
         configManager = new ConfigManager();
         setupRecentMenu();
         
@@ -132,7 +135,7 @@ public class Coddit2 extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         SaveFile = new javax.swing.JMenuItem();
         SaveFileAs = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         ExitIDE = new javax.swing.JMenuItem();
         EditMenu = new javax.swing.JMenu();
         CopyText = new javax.swing.JMenuItem();
@@ -140,6 +143,8 @@ public class Coddit2 extends javax.swing.JFrame {
         PasteText = new javax.swing.JMenuItem();
         FindMenu = new javax.swing.JMenuItem();
         ReplaceMenu = new javax.swing.JMenuItem();
+        TASTEMenu = new javax.swing.JMenu();
+        FunErrCode = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(720, 480));
@@ -282,7 +287,7 @@ public class Coddit2 extends javax.swing.JFrame {
             }
         });
         FileMenu.add(SaveFileAs);
-        FileMenu.add(jSeparator2);
+        FileMenu.add(jSeparator1);
 
         ExitIDE.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         ExitIDE.setText("Exit");
@@ -333,6 +338,14 @@ public class Coddit2 extends javax.swing.JFrame {
         EditMenu.add(ReplaceMenu);
 
         WindowMenu.add(EditMenu);
+
+        TASTEMenu.setText("TASTE");
+
+        FunErrCode.setSelected(true);
+        FunErrCode.setText("Fun Error Codes");
+        TASTEMenu.add(FunErrCode);
+
+        WindowMenu.add(TASTEMenu);
 
         setJMenuBar(WindowMenu);
 
@@ -431,22 +444,44 @@ public class Coddit2 extends javax.swing.JFrame {
             
             // Switch to Output tab
             OutputPane.setSelectedIndex(0);
-            OutputTab.setText("Running " + file.getName() + "...\n\n");
+            OutputTab.setText("");
             
-            // Delay execution to allow UI to update
-            javax.swing.Timer timer = new javax.swing.Timer(500, e -> {
-                // Run TASTE
-                String result = TASTE.run(file);
-                
-                try {
-                    javax.swing.text.Document doc = OutputTab.getDocument();
-                    doc.insertString(doc.getLength(), result, null);
-                } catch (javax.swing.text.BadLocationException ex) {
-                    ex.printStackTrace();
+            // Loading Animation
+            String[] frames = {"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"};
+            javax.swing.Timer animTimer = new javax.swing.Timer(100, new java.awt.event.ActionListener() {
+                int i = 0;
+                @Override
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    OutputTab.setText(frames[i] + " " +"Running " + file.getName());
+                    i = (i + 1) % frames.length;
                 }
             });
-            timer.setRepeats(false);
-            timer.start();
+            animTimer.start();
+            
+            // Run in background
+            new javax.swing.SwingWorker<TASTE.RunResult, Void>() {
+                @Override
+                protected TASTE.RunResult doInBackground() throws Exception {
+                    Thread.sleep(600); // Aesthetic delay
+                    return TASTE.run(file, FunErrCode.isSelected());
+                }
+
+                @Override
+                protected void done() {
+                    animTimer.stop();
+                    try {
+                        TASTE.RunResult result = get();
+                        String output = result.getOutput();
+                        boolean success = !output.contains("❌") && !output.contains("Error");
+                        
+                        String header = success ? "✔ Execution Successful" : "✘ Execution Failed";
+                        OutputTab.setText(header + "\n\n" + output);
+                        
+                    } catch (Exception ex) {
+                        OutputTab.setText("Internal Error: " + ex.getMessage());
+                    }
+                }
+            }.execute();
         }
     }//GEN-LAST:event_RunCodeActionPerformed
 
@@ -899,6 +934,7 @@ public class Coddit2 extends javax.swing.JFrame {
     private javax.swing.JTree FileTree;
     private javax.swing.JScrollPane FileTreeScroll;
     private javax.swing.JMenuItem FindMenu;
+    private javax.swing.JCheckBoxMenuItem FunErrCode;
     private javax.swing.JSplitPane HorizontalSep;
     private javax.swing.JMenuItem NewFile;
     private javax.swing.JMenuItem OpenProj;
@@ -911,6 +947,7 @@ public class Coddit2 extends javax.swing.JFrame {
     private javax.swing.JMenuItem SaveFile;
     private javax.swing.JMenuItem SaveFileAs;
     private javax.swing.JButton StopCode;
+    private javax.swing.JMenu TASTEMenu;
     private javax.swing.JEditorPane TerminalTab;
     private javax.swing.JSplitPane VerticalSep1;
     private javax.swing.JMenuBar WindowMenu;
@@ -919,7 +956,7 @@ public class Coddit2 extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     // End of variables declaration//GEN-END:variables
 }
