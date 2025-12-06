@@ -29,7 +29,12 @@ public class CodeEditor extends JPanel {
     public CodeEditor(String content) {
         super(new BorderLayout());
         
-        textPane = new JTextPane();
+        textPane = new JTextPane() {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return getUI().getPreferredSize(this).width <= getParent().getSize().width;
+            }
+        };
         textPane.setText(content);
         textPane.setFont(new Font("JetBrains Mono", Font.PLAIN, 12));
         textPane.setMargin(new java.awt.Insets(0, 5, 0, 5));
