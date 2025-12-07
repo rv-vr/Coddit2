@@ -1,4 +1,4 @@
-package coddit2;
+package coddit2.components;
 
 import java.awt.Color;
 import javax.swing.JTextPane;

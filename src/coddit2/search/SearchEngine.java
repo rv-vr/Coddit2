@@ -1,8 +1,8 @@
-package coddit2;
+package coddit2.search;
 
 import javax.swing.JOptionPane;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 
 /**
  * Handles text search and replacement operations within a text component.

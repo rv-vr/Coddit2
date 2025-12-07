@@ -1,5 +1,6 @@
-package coddit2;
+package coddit2.managers;
 
+import coddit2.Coddit2;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;

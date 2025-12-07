@@ -1,5 +1,6 @@
-package coddit2;
+package coddit2.components;
 
+import coddit2.components.TasteHighlighter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;

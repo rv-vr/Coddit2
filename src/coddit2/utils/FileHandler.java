@@ -1,4 +1,4 @@
-package coddit2;
+package coddit2.utils;
 
 import java.io.*;
 import java.nio.file.Files;
