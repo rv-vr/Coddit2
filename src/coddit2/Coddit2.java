@@ -17,6 +17,7 @@ public class Coddit2 extends javax.swing.JFrame {
     private java.io.File currentProjectFolder;
     private ConfigManager configManager;
     private javax.swing.JMenu openRecentMenu;
+    private javax.swing.JLabel statusLabel;
 
     // Search Bar Components
     private javax.swing.JPanel SearchBar;
@@ -35,8 +36,16 @@ public class Coddit2 extends javax.swing.JFrame {
     public Coddit2() {
         initComponents();
         
-        // Add padding to the main window content pane
-        ((javax.swing.JComponent) getContentPane()).setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        // Re-layout components to allow full-width status bar
+        getContentPane().remove(RunBar);
+        getContentPane().remove(HorizontalSep);
+        
+        javax.swing.JPanel mainContainer = new javax.swing.JPanel(new java.awt.BorderLayout());
+        mainContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        mainContainer.add(HorizontalSep, java.awt.BorderLayout.CENTER);
+        mainContainer.add(RunBar, java.awt.BorderLayout.EAST);
+        
+        getContentPane().add(mainContainer, java.awt.BorderLayout.CENTER);
         
         configManager = new ConfigManager();
         setupRecentMenu();
@@ -54,6 +63,8 @@ public class Coddit2 extends javax.swing.JFrame {
         
         // Initialize Search Bar
         createSearchBar();
+        setupStatusBar();
+        setupOutputTabHeader();
         
         // Setup Undo/Redo in Edit Menu
         javax.swing.JMenuItem undoItem = new javax.swing.JMenuItem("Undo");
@@ -96,7 +107,21 @@ public class Coddit2 extends javax.swing.JFrame {
         // Add Tab on New Start
         createNewTab();
         
+        // Close Tab Shortcut (Ctrl+W)
+        javax.swing.JRootPane rootPane = this.getRootPane();
+        javax.swing.InputMap inputMap = rootPane.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW);
+        javax.swing.ActionMap actionMap = rootPane.getActionMap();
         
+        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_DOWN_MASK), "CloseTab");
+        actionMap.put("CloseTab", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                int index = EditorTabs.getSelectedIndex();
+                if (index != -1) {
+                    closeTab(index);
+                }
+            }
+        });
         
         this.revalidate();
 
@@ -421,7 +446,7 @@ public class Coddit2 extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void EditorTabsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_EditorTabsStateChanged
-        
+        updateCursorPosition();
     }//GEN-LAST:event_EditorTabsStateChanged
 
     private void RunCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RunCodeActionPerformed
@@ -877,12 +902,68 @@ public class Coddit2 extends javax.swing.JFrame {
             @Override public void removeUpdate(javax.swing.event.DocumentEvent de) { setTabTitleBold(textArea, true); }
         });
         
+        textArea.addCaretListener(e -> updateCursorPosition());
+
         EditorTabs.addTab(title, editor);
         
         int index = EditorTabs.indexOfComponent(editor);
         EditorTabs.setTabComponentAt(index, createTabTitlePanel(title));
         
         EditorTabs.setSelectedComponent(editor);
+    }
+
+    private void setupStatusBar() {
+        javax.swing.JPanel statusBar = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        statusBar.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, javax.swing.UIManager.getColor("Component.borderColor")));
+        statusLabel = new javax.swing.JLabel("Line: 1, Column: 1");
+        statusLabel.setFont(new java.awt.Font("Roboto", 0, 11));
+        statusBar.add(statusLabel);
+        getContentPane().add(statusBar, java.awt.BorderLayout.SOUTH);
+    }
+
+    private void setupOutputTabHeader() {
+        javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        panel.setOpaque(false);
+        panel.add(new javax.swing.JLabel("Output"));
+        
+        javax.swing.JButton clearBtn = new javax.swing.JButton(""); // Trash icon
+        clearBtn.setFont(new java.awt.Font("Segoe MDL2 Assets", 0, 12));
+        clearBtn.setToolTipText("Clear Output");
+        clearBtn.setBorderPainted(false);
+        clearBtn.setContentAreaFilled(false);
+        clearBtn.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        clearBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clearBtn.addActionListener(e -> OutputTab.setText(""));
+        
+        panel.add(clearBtn);
+        
+        int index = OutputPane.indexOfComponent(jScrollPane3);
+        if (index != -1) {
+            OutputPane.setTabComponentAt(index, panel);
+        }
+    }
+
+    private void updateCursorPosition() {
+        javax.swing.text.JTextComponent textArea = getCurrentTextArea();
+        if (textArea != null) {
+            try {
+                int caretPos = textArea.getCaretPosition();
+                int line = -1;
+                int col = -1;
+                
+                // Get line and column
+                javax.swing.text.Element root = textArea.getDocument().getDefaultRootElement();
+                line = root.getElementIndex(caretPos) + 1;
+                int startOfLineOffset = root.getElement(line - 1).getStartOffset();
+                col = caretPos - startOfLineOffset + 1;
+                
+                statusLabel.setText("Line: " + line + ", Column: " + col);
+            } catch (Exception e) {
+                statusLabel.setText("Line: -, Column: -");
+            }
+        } else {
+            statusLabel.setText("");
+        }
     }
 
     /**

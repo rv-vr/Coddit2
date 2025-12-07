@@ -28,3 +28,4 @@ public class Token {
         return String.format("<%s, '%s', Line: %d>", type, value, line);
     }
 }
+

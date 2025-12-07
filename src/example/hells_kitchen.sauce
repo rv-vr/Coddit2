@@ -4,7 +4,7 @@
 // ==========================================
 
 // 1. LEXICAL INDIGESTION (Unknown Character)
-// Chunk garbage = @
+ Chunk garbage = @
 
 // 2. MISSING INGREDIENT (Undefined Variable)
 // burp(lamb_sauce)
@@ -47,7 +47,7 @@
 // x 5
 
 // 15. EMPTY PLATE (Expected Value)
- Chunk x = 
+// Chunk x = 
 
 // 16. WRONG FOOD TYPE (Expected Data Type)
 // Pizza x = 5

@@ -25,6 +25,7 @@ public class CodeEditor extends JPanel {
     private final UndoManager undoManager;
     private final JScrollPane scrollPane;
     private int lastLineCount = 0;
+    private float currentFontSize = 12f;
 
     public CodeEditor(String content) {
         super(new BorderLayout());
@@ -49,6 +50,9 @@ public class CodeEditor extends JPanel {
         
         setupHighlighter();
         setupUndoRedo();
+        setupSmartInput();
+        setupFontZoom();
+        setupContextMenu();
         setupLineNumbers();
 
         scrollPane = new JScrollPane(textPane);
@@ -99,6 +103,168 @@ public class CodeEditor extends JPanel {
                 if (undoManager.canRedo()) undoManager.redo();
             }
         });
+    }
+
+    private void setupSmartInput() {
+        // Map Tab to 4 spaces
+        textPane.getInputMap().put(KeyStroke.getKeyStroke("TAB"), "insert-spaces");
+        textPane.getActionMap().put("insert-spaces", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int caret = textPane.getCaretPosition();
+                    textPane.getDocument().insertString(caret, "    ", null);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        textPane.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    e.consume();
+                    try {
+                        int caret = textPane.getCaretPosition();
+                        int rowStart = javax.swing.text.Utilities.getRowStart(textPane, caret);
+                        String line = textPane.getText(rowStart, caret - rowStart);
+                        
+                        StringBuilder whitespace = new StringBuilder();
+                        for (char c : line.toCharArray()) {
+                            if (Character.isWhitespace(c)) {
+                                whitespace.append(c);
+                            } else {
+                                break;
+                            }
+                        }
+                        String indent = whitespace.toString();
+                        String trimmed = line.trim();
+                        
+                        String nextChar = "";
+                        if (caret < textPane.getDocument().getLength()) {
+                            nextChar = textPane.getText(caret, 1);
+                        }
+                        
+                        boolean splitBrace = (trimmed.endsWith("{") && "}".equals(nextChar));
+                        boolean splitBracket = (trimmed.endsWith("[") && "]".equals(nextChar));
+                        boolean splitParen = (trimmed.endsWith("(") && ")".equals(nextChar));
+                        
+                        if (splitBrace || splitBracket || splitParen) {
+                            String insert = "\n" + indent + "    " + "\n" + indent;
+                            textPane.getDocument().insertString(caret, insert, null);
+                            textPane.setCaretPosition(caret + indent.length() + 5);
+                        } else {
+                            String prefix = "\n" + indent;
+                            if (trimmed.endsWith("{") || trimmed.endsWith("[") || trimmed.endsWith("(") || trimmed.endsWith(":")) {
+                                prefix += "    ";
+                            }
+                            textPane.getDocument().insertString(caret, prefix, null);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                char c = e.getKeyChar();
+                String pair = "";
+                switch (c) {
+                    case '{': pair = "}"; break;
+                    case '(': pair = ")"; break;
+                    case '[': pair = "]"; break;
+                    case '"': pair = "\""; break;
+                }
+                
+                if (!pair.isEmpty()) {
+                    try {
+                        int caret = textPane.getCaretPosition();
+                        textPane.getDocument().insertString(caret, String.valueOf(c) + pair, null);
+                        textPane.setCaretPosition(caret + 1);
+                        e.consume();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupFontZoom() {
+        javax.swing.Action zoomIn = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentFontSize += 1.0f;
+                Font newFont = textPane.getFont().deriveFont(currentFontSize);
+                textPane.setFont(newFont);
+                lineNumbers.setFont(newFont);
+            }
+        };
+
+        javax.swing.Action zoomOut = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentFontSize = Math.max(8.0f, currentFontSize - 1.0f);
+                Font newFont = textPane.getFont().deriveFont(currentFontSize);
+                textPane.setFont(newFont);
+                lineNumbers.setFont(newFont);
+            }
+        };
+
+        javax.swing.Action zoomReset = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentFontSize = 12.0f;
+                Font newFont = textPane.getFont().deriveFont(currentFontSize);
+                textPane.setFont(newFont);
+                lineNumbers.setFont(newFont);
+            }
+        };
+
+        javax.swing.InputMap inputMap = textPane.getInputMap(javax.swing.JComponent.WHEN_FOCUSED);
+        javax.swing.ActionMap actionMap = textPane.getActionMap();
+
+        // Zoom In: Ctrl + =, Ctrl + Numpad +
+        inputMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.InputEvent.CTRL_DOWN_MASK), "ZoomIn");
+        inputMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ADD, java.awt.event.InputEvent.CTRL_DOWN_MASK), "ZoomIn");
+        
+        // Zoom Out: Ctrl + -, Ctrl + Numpad -
+        inputMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.event.InputEvent.CTRL_DOWN_MASK), "ZoomOut");
+        inputMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SUBTRACT, java.awt.event.InputEvent.CTRL_DOWN_MASK), "ZoomOut");
+
+        // Reset: Ctrl + 0
+        inputMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_DOWN_MASK), "ZoomReset");
+        inputMap.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0, java.awt.event.InputEvent.CTRL_DOWN_MASK), "ZoomReset");
+
+        actionMap.put("ZoomIn", zoomIn);
+        actionMap.put("ZoomOut", zoomOut);
+        actionMap.put("ZoomReset", zoomReset);
+    }
+
+    private void setupContextMenu() {
+        javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
+        
+        javax.swing.JMenuItem cut = new javax.swing.JMenuItem(new javax.swing.text.DefaultEditorKit.CutAction());
+        cut.setText("Cut");
+        popup.add(cut);
+        
+        javax.swing.JMenuItem copy = new javax.swing.JMenuItem(new javax.swing.text.DefaultEditorKit.CopyAction());
+        copy.setText("Copy");
+        popup.add(copy);
+        
+        javax.swing.JMenuItem paste = new javax.swing.JMenuItem(new javax.swing.text.DefaultEditorKit.PasteAction());
+        paste.setText("Paste");
+        popup.add(paste);
+        
+        popup.addSeparator();
+        
+        javax.swing.JMenuItem selectAll = new javax.swing.JMenuItem("Select All");
+        selectAll.addActionListener(e -> textPane.selectAll());
+        popup.add(selectAll);
+        
+        textPane.setComponentPopupMenu(popup);
     }
 
     private void setupLineNumbers() {
