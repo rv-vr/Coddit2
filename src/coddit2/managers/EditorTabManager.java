@@ -13,8 +13,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.DocumentEvent;
+import java.io.IOException;
+import javax.swing.JOptionPane;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
+import coddit2.utils.FileHandler;
 
 public class EditorTabManager {
     private final Coddit2 mainFrame;
@@ -162,7 +166,7 @@ public class EditorTabManager {
                 int col = -1;
                 
                 // Get line and column
-                javax.swing.text.Element root = textArea.getDocument().getDefaultRootElement();
+                Element root = textArea.getDocument().getDefaultRootElement();
                 line = root.getElementIndex(caretPos) + 1;
                 int startOfLineOffset = root.getElement(line - 1).getStartOffset();
                 col = caretPos - startOfLineOffset + 1;
@@ -196,7 +200,7 @@ public class EditorTabManager {
             }
         }
 
-        if (coddit2.utils.FileHandler.isBinaryFile(file)) {
+        if (FileHandler.isBinaryFile(file)) {
             createNewTab(file.getName(), "This file cannot be opened.", file);
             JTextComponent textArea = getCurrentTextArea();
             if (textArea != null) {
@@ -206,10 +210,10 @@ public class EditorTabManager {
         }
 
         try {
-            String content = coddit2.utils.FileHandler.readFile(file);
+            String content = FileHandler.readFile(file);
             createNewTab(file.getName(), content, file);
-        } catch (java.io.IOException ex) {
-            javax.swing.JOptionPane.showMessageDialog(mainFrame, "Error reading file: " + ex.getMessage());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(mainFrame, "Error reading file: " + ex.getMessage());
         }
     }
 }

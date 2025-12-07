@@ -1,9 +1,16 @@
 package coddit2.utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigManager {
     private static final String CONFIG_DIR = System.getProperty("user.home") + File.separator + ".coddit2";

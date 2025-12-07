@@ -1,9 +1,14 @@
 package coddit2.utils;
 
-import java.io.*;
+import java.awt.Component;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import javax.swing.JFileChooser;
-import java.awt.Component;
 
 public class FileHandler {
 

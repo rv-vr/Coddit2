@@ -1,8 +1,8 @@
 package coddit2.managers;
 
 import coddit2.Coddit2;
-import coddit2.utils.FileHandler;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.Icon;
@@ -90,9 +90,9 @@ public class ProjectExplorer {
         fileTree.validate();
         
         SwingUtilities.invokeLater(() -> {
-            java.awt.Dimension treeSize = fileTree.getPreferredSize();
+            Dimension treeSize = fileTree.getPreferredSize();
             int newDividerLocation = treeSize.width + 64;
-            int maxWidth = 300; 
+            int maxWidth = 300;  
             if (newDividerLocation > maxWidth) {
                 newDividerLocation = maxWidth;
             }

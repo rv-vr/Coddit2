@@ -1,9 +1,9 @@
 package coddit2.components;
 
-import coddit2.components.TasteHighlighter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -39,13 +39,13 @@ public class CodeEditor extends JPanel {
         };
         textPane.setText(content);
         textPane.setFont(new Font("JetBrains Mono", Font.PLAIN, 12));
-        textPane.setMargin(new java.awt.Insets(0, 5, 0, 5));
+        textPane.setMargin(new Insets(0, 5, 0, 5));
 
         lineNumbers = new JTextArea("1");
         lineNumbers.setBackground(Color.LIGHT_GRAY);
         lineNumbers.setEditable(false);
         lineNumbers.setFont(new Font("JetBrains Mono", Font.PLAIN, 12));
-        lineNumbers.setMargin(new java.awt.Insets(0, 5, 0, 5));
+        lineNumbers.setMargin(new Insets(0, 5, 0, 5));
 
         undoManager = new UndoManager();
         

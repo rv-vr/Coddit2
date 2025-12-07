@@ -3,26 +3,58 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package coddit2;
+
 import coddit2.managers.EditorTabManager;
 import coddit2.managers.ExecutionManager;
 import coddit2.managers.ProjectExplorer;
 import coddit2.search.FindReplaceBar;
 import coddit2.utils.ConfigManager;
 import coddit2.utils.FileHandler;
-import com.formdev.flatlaf.*;
-import javax.swing.*;
+import com.formdev.flatlaf.FlatLightLaf;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.JTextComponent;
+import javax.swing.undo.UndoManager;
 
 
 /**
  *
  * @author vince
  */
-public class Coddit2 extends javax.swing.JFrame {
+public class Coddit2 extends JFrame {
 
     private ConfigManager configManager;
-    private javax.swing.JMenu openRecentMenu;
-    private javax.swing.JLabel statusLabel;
+    private JMenu openRecentMenu;
+    private JLabel statusLabel;
     
     private ProjectExplorer projectExplorer;
     private EditorTabManager editorTabManager;
@@ -39,11 +71,11 @@ public class Coddit2 extends javax.swing.JFrame {
         getContentPane().remove(RunBar);
         getContentPane().remove(HorizontalSep);
         
-        javax.swing.JPanel mainContainer = new javax.swing.JPanel(new java.awt.BorderLayout());
-        mainContainer.add(HorizontalSep, java.awt.BorderLayout.CENTER);
-        mainContainer.add(RunBar, java.awt.BorderLayout.EAST);
+        JPanel mainContainer = new JPanel(new BorderLayout());
+        mainContainer.add(HorizontalSep, BorderLayout.CENTER);
+        mainContainer.add(RunBar, BorderLayout.EAST);
         
-        getContentPane().add(mainContainer, java.awt.BorderLayout.CENTER);
+        getContentPane().add(mainContainer, BorderLayout.CENTER);
         
         configManager = new ConfigManager();
         setupRecentMenu();
@@ -57,16 +89,16 @@ public class Coddit2 extends javax.swing.JFrame {
         findReplaceBar = new FindReplaceBar(editorTabManager);
         
         // Add Search Bar
-        javax.swing.JPanel editorContainer = new javax.swing.JPanel(new java.awt.BorderLayout());
-        editorContainer.add(EditorTabs, java.awt.BorderLayout.CENTER);
-        editorContainer.add(findReplaceBar, java.awt.BorderLayout.SOUTH);
+        JPanel editorContainer = new JPanel(new BorderLayout());
+        editorContainer.add(EditorTabs, BorderLayout.CENTER);
+        editorContainer.add(findReplaceBar, BorderLayout.SOUTH);
         VerticalSep1.setTopComponent(editorContainer);
         
         // Check for first instance and load last project
         if (configManager.acquireInstanceLock()) {
             String lastProj = configManager.getLastProject();
             if (lastProj != null) {
-                java.io.File projFile = new java.io.File(lastProj);
+                File projFile = new File(lastProj);
                 if (projFile.exists()) {
                     projectExplorer.updateFileTree(projFile);
                 }
@@ -95,14 +127,14 @@ public class Coddit2 extends javax.swing.JFrame {
         editorTabManager.createNewTab();
         
         // Close Tab Shortcut (Ctrl+W)
-        javax.swing.JRootPane rootPane = this.getRootPane();
-        javax.swing.InputMap inputMap = rootPane.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW);
-        javax.swing.ActionMap actionMap = rootPane.getActionMap();
+        JRootPane rootPane = this.getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
         
-        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_DOWN_MASK), "CloseTab");
-        actionMap.put("CloseTab", new javax.swing.AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), "CloseTab");
+        actionMap.put("CloseTab", new AbstractAction() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 int index = EditorTabs.getSelectedIndex();
                 if (index != -1) {
                     editorTabManager.closeTab(index);
@@ -423,7 +455,7 @@ public class Coddit2 extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void OpenProjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenProjActionPerformed
-        java.io.File folder = FileHandler.openDirectoryChooser(this);
+        File folder = FileHandler.openDirectoryChooser(this);
         if (folder != null) {
             projectExplorer.updateFileTree(folder);
             configManager.addRecentProject(folder.getAbsolutePath());
@@ -432,15 +464,15 @@ public class Coddit2 extends javax.swing.JFrame {
     }//GEN-LAST:event_OpenProjActionPerformed
 
     private void SaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveFileActionPerformed
-        javax.swing.text.JTextComponent textArea = editorTabManager.getCurrentTextArea();
+        JTextComponent textArea = editorTabManager.getCurrentTextArea();
         if (textArea != null) {
-            java.io.File file = (java.io.File) textArea.getClientProperty("file");
+            File file = (File) textArea.getClientProperty("file");
             if (file != null) {
                 try {
                     FileHandler.saveFile(file, textArea.getText());
                     editorTabManager.setTabTitleBold(textArea, false);
-                } catch (java.io.IOException ex) {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage());
                 }
             } else {
                 SaveFileAsActionPerformed(evt);
@@ -453,9 +485,9 @@ public class Coddit2 extends javax.swing.JFrame {
     }//GEN-LAST:event_ExitIDEActionPerformed
 
     private void SaveFileAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveFileAsActionPerformed
-        javax.swing.text.JTextComponent textArea = editorTabManager.getCurrentTextArea();
+        JTextComponent textArea = editorTabManager.getCurrentTextArea();
         if (textArea != null) {
-            java.io.File file = (java.io.File) textArea.getClientProperty("file");
+            File file = (File) textArea.getClientProperty("file");
             if (file == null) {
                 file = FileHandler.saveFileChooser(this);
             }
@@ -470,8 +502,8 @@ public class Coddit2 extends javax.swing.JFrame {
                     editorTabManager.updateTabTitle(index, file.getName());
                     editorTabManager.setTabTitleBold(textArea, false);
                     
-                } catch (java.io.IOException ex) {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage());
                 }
             }
         }
@@ -502,47 +534,47 @@ public class Coddit2 extends javax.swing.JFrame {
     }//GEN-LAST:event_StopCodeActionPerformed
 
     private void undoItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoItemActionPerformed
-        javax.swing.text.JTextComponent textArea = editorTabManager.getCurrentTextArea();
+        JTextComponent textArea = editorTabManager.getCurrentTextArea();
             if (textArea != null) {
-                javax.swing.undo.UndoManager um = (javax.swing.undo.UndoManager) textArea.getClientProperty("undoManager");
+                UndoManager um = (UndoManager) textArea.getClientProperty("undoManager");
                 if (um != null && um.canUndo()) um.undo();
         }
     }//GEN-LAST:event_undoItemActionPerformed
 
     private void redoItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redoItemActionPerformed
-        javax.swing.text.JTextComponent textArea = editorTabManager.getCurrentTextArea();
+        JTextComponent textArea = editorTabManager.getCurrentTextArea();
             if (textArea != null) {
-                javax.swing.undo.UndoManager um = (javax.swing.undo.UndoManager) textArea.getClientProperty("undoManager");
+                UndoManager um = (UndoManager) textArea.getClientProperty("undoManager");
                 if (um != null && um.canRedo()) um.redo();
         }
     }//GEN-LAST:event_redoItemActionPerformed
      
     private void setupRecentMenu() {
-        openRecentMenu = new javax.swing.JMenu("Open Recent");
-        openRecentMenu.setFont(new java.awt.Font("Roboto", 0, 12));
+        openRecentMenu = new JMenu("Open Recent");
+        openRecentMenu.setFont(new Font("Roboto", 0, 12));
         FileMenu.add(openRecentMenu, 2); // Insert after Open Project
         updateRecentMenu();
     }
 
     private void updateRecentMenu() {
         openRecentMenu.removeAll();
-        java.util.List<String> recent = configManager.getRecentProjects();
+        List<String> recent = configManager.getRecentProjects();
         if (recent.isEmpty()) {
-            javax.swing.JMenuItem item = new javax.swing.JMenuItem("No Recent Projects");
+            JMenuItem item = new JMenuItem("No Recent Projects");
             item.setEnabled(false);
             openRecentMenu.add(item);
         } else {
             for (String path : recent) {
-                javax.swing.JMenuItem item = new javax.swing.JMenuItem(path);
-                item.setFont(new java.awt.Font("Roboto", 0, 12));
+                JMenuItem item = new JMenuItem(path);
+                item.setFont(new Font("Roboto", 0, 12));
                 item.addActionListener(e -> {
-                    java.io.File folder = new java.io.File(path);
+                    File folder = new File(path);
                     if (folder.exists()) {
                         projectExplorer.updateFileTree(folder);
                         configManager.addRecentProject(path);
                         updateRecentMenu();
                     } else {
-                        javax.swing.JOptionPane.showMessageDialog(this, "Project directory not found.");
+                        JOptionPane.showMessageDialog(this, "Project directory not found.");
                     }
                 });
                 openRecentMenu.add(item);
@@ -554,7 +586,7 @@ public class Coddit2 extends javax.swing.JFrame {
         statusLabel.setText(text);
     }
 
-    public void openFileInTab(java.io.File file) {
+    public void openFileInTab(File file) {
         editorTabManager.openFileInTab(file);
     }
 
@@ -573,26 +605,26 @@ public class Coddit2 extends javax.swing.JFrame {
 
 
     private void setupStatusBar() {
-        javax.swing.JPanel statusBar = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        statusBar.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, javax.swing.UIManager.getColor("Component.borderColor")));
-        statusLabel = new javax.swing.JLabel("Line: 1, Column: 1");
-        statusLabel.setFont(new java.awt.Font("Roboto", 0, 11));
+        JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        statusBar.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
+        statusLabel = new JLabel("Line: 1, Column: 1");
+        statusLabel.setFont(new Font("Roboto", 0, 11));
         statusBar.add(statusLabel);
-        getContentPane().add(statusBar, java.awt.BorderLayout.SOUTH);
+        getContentPane().add(statusBar, BorderLayout.SOUTH);
     }
 
     private void setupOutputTabHeader() {
-        javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         panel.setOpaque(false);
-        panel.add(new javax.swing.JLabel("Output"));
+        panel.add(new JLabel("Output"));
         
-        javax.swing.JButton clearBtn = new javax.swing.JButton(""); // Trash icon
-        clearBtn.setFont(new java.awt.Font("Segoe MDL2 Assets", 0, 12));
+        JButton clearBtn = new JButton(""); // Trash icon
+        clearBtn.setFont(new Font("Segoe MDL2 Assets", 0, 12));
         clearBtn.setToolTipText("Clear Output");
         clearBtn.setBorderPainted(false);
         clearBtn.setContentAreaFilled(false);
-        clearBtn.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        clearBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clearBtn.setMargin(new Insets(0, 0, 0, 0));
+        clearBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         clearBtn.addActionListener(e -> OutputTab.setText(""));
         
         panel.add(clearBtn);
@@ -619,27 +651,27 @@ public class Coddit2 extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Coddit2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Coddit2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Coddit2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Coddit2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
         }
         //</editor-fold>
         
         FlatLightLaf.setup();
         
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Coddit2().setVisible(true);
             }
