@@ -8,7 +8,6 @@ public enum TokenType {
     KEY_BOOLEAN,    // Taste
     KEY_PRINT,      // burp
     KEY_INPUT,      // swallow
-    KEY_DECLARE,    // grab
     KEY_IF,         // chew
     KEY_ELSE,       // spit
     KEY_ELSE_IF,    // nibble

@@ -162,7 +162,6 @@ public class Lexer {
 
     private TokenType getKeywordType(String word) {
         switch (word) {
-            case "grab": return TokenType.KEY_DECLARE;
             case "Chunk": return TokenType.KEY_INTEGER;
             case "Slurp": return TokenType.KEY_FLOAT;
             case "Wrap": return TokenType.KEY_STRING;

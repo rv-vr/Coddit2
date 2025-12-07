@@ -39,10 +39,6 @@ public class Interpreter {
     private void parseStatement() {
         Token token = peek();
         switch (token.getType()) {
-            case KEY_DECLARE:
-                advance(); // consume grab
-                parseDeclaration();
-                break;
             case KEY_INTEGER:
             case KEY_FLOAT:
             case KEY_STRING:

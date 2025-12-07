@@ -16,7 +16,7 @@ Statement    ::= Declaration
                | Input
 
 /* --- Variable Operations --- */
-Declaration  ::= "grab"? DataType ID ( "=" Expression )?
+Declaration  ::= DataType ID ( "=" Expression )?
 Assignment   ::= ID "=" Expression
 
 /* --- I/O Operations --- */
@@ -69,7 +69,6 @@ Literal      ::= Integer
 | Boolean | `Taste` | True/False | `Taste isGood = Yum` |
 
 ### Keywords
-*   **`grab`**: Declares a variable (optional prefix).
 *   **`Yum` / `Yuck`**: Boolean literals for `True` and `False`.
 *   **`burp`**: Prints output to the console.
 *   **`swallow`**: Takes input from the user.
