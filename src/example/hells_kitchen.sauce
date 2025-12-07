@@ -4,22 +4,22 @@
 // ==========================================
 
 // 1. LEXICAL INDIGESTION (Unknown Character)
-// grab Chunk garbage = @
+// Chunk garbage = @
 
 // 2. MISSING INGREDIENT (Undefined Variable)
 // burp(lamb_sauce)
 
 // 3. BAD RECIPE MIX (Type Mismatch - Math)
-// grab Chunk weird = 10 - "Sandwich"
+// Chunk weird = 10 - "Sandwich"
 
 // 4. UNARY MINUS ON NON-NUMBER
-// grab Wrap text = -"Hello"
+// Wrap text = -"Hello"
 
 // 5. MISSING SAUCE (Expected '=')
-// grab Chunk buns 10
+// Chunk buns 10
 
 // 6. MISSING ID (Expected Identifier)
-// grab Chunk = 5
+// Chunk = 5
 
 // 7. MISSING CHEW (Expected 'chew' for if)
 // if (Yum) {}
@@ -43,11 +43,11 @@
 // chew (Yum) { burp("No closing brace")
 
 // 14. UNKNOWN FLAVOR (Unexpected Token)
-// grab Chunk x = 5
+// Chunk x = 5
 // x 5
 
 // 15. EMPTY PLATE (Expected Value)
- grab Chunk x = 
+ Chunk x = 
 
 // 16. WRONG FOOD TYPE (Expected Data Type)
-// grab Pizza x = 5
+// Pizza x = 5

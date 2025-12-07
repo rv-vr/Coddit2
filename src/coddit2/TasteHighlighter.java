@@ -68,7 +68,7 @@ public class TasteHighlighter implements DocumentListener {
                 doc.setCharacterAttributes(0, text.length(), normalStyle, true);
 
                 // 1. Highlight Keywords
-                String keywords = "\\b(grab|chew|spit|nibble|burp|swallow)\\b";
+                String keywords = "\\b(chew|spit|nibble|burp|swallow)\\b";
                 Pattern keywordPattern = Pattern.compile(keywords);
                 Matcher keywordMatcher = keywordPattern.matcher(text);
                 while (keywordMatcher.find()) {

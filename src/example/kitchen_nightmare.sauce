@@ -3,11 +3,11 @@
 // Testing comments, variable declarations, and types.
 // ==========================================
 
-grab Chunk bun_count = 10
-grab Slurp sauce_ratio = 5.5
-grab Wrap chef_name = "Gordon"
-grab Taste is_kitchen_open = Yum
-grab Taste is_rat_present = Yuck
+Chunk bun_count = 10
+Slurp sauce_ratio = 5.5
+Wrap chef_name = "Gordon"
+Taste is_kitchen_open = Yum
+Taste is_rat_present = Yuck
 
 burp("--- PHASE 1 COMPLETE ---")
 burp("Chef: " + chef_name)
@@ -17,8 +17,8 @@ burp("Chef: " + chef_name)
 // Testing arithmetic and string concatenation
 // ==========================================
 
-grab Chunk extra_buns = 2
-grab Slurp reduced_sauce = 2.5
+Chunk extra_buns = 2
+Slurp reduced_sauce = 2.5
 
 // Test: Integer Math
 bun_count = bun_count + extra_buns 
@@ -30,7 +30,7 @@ burp("Sauce Ratio (Should be 3.0): " + sauce_ratio)
 
 // Test: The "Soup" Mix (String + Number)
 // Does your language auto-convert the number to text here?
-grab Wrap status = "Buns available: " + bun_count
+Wrap status = "Buns available: " + bun_count
 burp(status)
 
 burp("--- PHASE 2 COMPLETE ---")
@@ -71,7 +71,7 @@ burp("--- PHASE 3 COMPLETE ---")
 // burp(spaghetti)
 
 // Test 2: Division by Zero
-grab Chunk chaos = 10 / 0
+Chunk chaos = 10 / 0
 
 // Test 3: Type Mismatch (Math with Text)
-// grab Chunk weird = 10 - "Sandwich"
+// Chunk weird = 10 - "Sandwich"
