@@ -16,7 +16,7 @@
 // Wrap text = -"Hello"
 
 // 5. MISSING SAUCE (Expected '=')
-// Chunk buns 10
+ Chunk buns 10
 
 // 6. MISSING ID (Expected Identifier)
 // Chunk = 5

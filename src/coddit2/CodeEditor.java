@@ -27,7 +27,7 @@ public class CodeEditor extends JPanel {
     private int lastLineCount = 0;
     private float currentFontSize = 12f;
 
-    public CodeEditor(String content) {
+    public CodeEditor(String content, String fileName) {
         super(new BorderLayout());
         
         textPane = new JTextPane() {
@@ -48,7 +48,9 @@ public class CodeEditor extends JPanel {
 
         undoManager = new UndoManager();
         
-        setupHighlighter();
+        if (fileName != null && (fileName.endsWith(".taste") || fileName.endsWith(".sauce"))) {
+            setupHighlighter();
+        }
         setupUndoRedo();
         setupSmartInput();
         setupFontZoom();
@@ -59,6 +61,10 @@ public class CodeEditor extends JPanel {
         scrollPane.setRowHeaderView(lineNumbers);
         
         add(scrollPane, BorderLayout.CENTER);
+        
+        this.setBorder(null);
+        textPane.setBorder(null);
+        scrollPane.setBorder(null);
     }
 
     public JTextPane getTextPane() {

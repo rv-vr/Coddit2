@@ -5,6 +5,7 @@
 package coddit2;
 import com.formdev.flatlaf.*;
 import javax.swing.*;
+import java.awt.Color;
 import taste.TASTE;
 
 
@@ -41,7 +42,6 @@ public class Coddit2 extends javax.swing.JFrame {
         getContentPane().remove(HorizontalSep);
         
         javax.swing.JPanel mainContainer = new javax.swing.JPanel(new java.awt.BorderLayout());
-        mainContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
         mainContainer.add(HorizontalSep, java.awt.BorderLayout.CENTER);
         mainContainer.add(RunBar, java.awt.BorderLayout.EAST);
         
@@ -101,9 +101,15 @@ public class Coddit2 extends javax.swing.JFrame {
             System.err.println( "Failed to initialize LaF" );
         }
         this.getRootPane().putClientProperty("JRootPane.menuBarEmbedded", true);
-        this.setTitle("Coddit");
-        this.setLocationRelativeTo(null); 
         
+        if (currentProjectFolder != null) {
+            this.setTitle("Coddit - " + currentProjectFolder.getName());
+        } else {
+            this.setTitle("Coddit");
+        }
+        
+        this.setLocationRelativeTo(null); 
+
         // Add Tab on New Start
         createNewTab();
         
@@ -123,8 +129,9 @@ public class Coddit2 extends javax.swing.JFrame {
             }
         });
         
+        
+        this.getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(0xDBDBDB));
         this.revalidate();
-
     }
 
     /**
@@ -172,12 +179,14 @@ public class Coddit2 extends javax.swing.JFrame {
         FunErrCode = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         setPreferredSize(new java.awt.Dimension(720, 480));
 
+        RunBar.setBackground(new java.awt.Color(234, 234, 234));
         RunBar.setLayout(new java.awt.GridBagLayout());
 
-        RunCode.setBackground(new java.awt.Color(242, 242, 242));
-        RunCode.setFont(new java.awt.Font("Segoe MDL2 Assets", 1, 18)); // NOI18N
+        RunCode.setBackground(new java.awt.Color(234, 234, 234));
+        RunCode.setFont(new java.awt.Font("Segoe Fluent Icons", 1, 18)); // NOI18N
         RunCode.setForeground(new java.awt.Color(0, 153, 0));
         RunCode.setText("");
         RunCode.setToolTipText("Run Code");
@@ -196,8 +205,8 @@ public class Coddit2 extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         RunBar.add(RunCode, gridBagConstraints);
 
-        StopCode.setBackground(new java.awt.Color(242, 242, 242));
-        StopCode.setFont(new java.awt.Font("Segoe MDL2 Assets", 1, 18)); // NOI18N
+        StopCode.setBackground(new java.awt.Color(234, 234, 234));
+        StopCode.setFont(new java.awt.Font("Segoe Fluent Icons", 1, 18)); // NOI18N
         StopCode.setForeground(new java.awt.Color(255, 0, 0));
         StopCode.setText("");
         StopCode.setToolTipText("Stop Program");
@@ -221,36 +230,54 @@ public class Coddit2 extends javax.swing.JFrame {
 
         getContentPane().add(RunBar, java.awt.BorderLayout.EAST);
 
+        HorizontalSep.setBackground(new java.awt.Color(234, 234, 234));
         HorizontalSep.setResizeWeight(0.3);
         HorizontalSep.setToolTipText("");
 
+        VerticalSep1.setBackground(new java.awt.Color(228, 228, 228));
         VerticalSep1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         VerticalSep1.setResizeWeight(0.7);
 
+        jScrollPane1.setBackground(new java.awt.Color(102, 255, 0));
+        jScrollPane1.setBorder(null);
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         jEditorPane1.setPreferredSize(null);
         jScrollPane1.setViewportView(jEditorPane1);
 
         VerticalSep1.setTopComponent(jScrollPane1);
 
+        OutputPane.setBackground(new java.awt.Color(255, 255, 255));
         OutputPane.setFocusable(false);
         OutputPane.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        OutputPane.setOpaque(true);
+
+        jScrollPane3.setBackground(new java.awt.Color(102, 102, 0));
+        jScrollPane3.setBorder(null);
+        jScrollPane3.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         OutputTab.setEditable(false);
         OutputTab.setBackground(new java.awt.Color(255, 255, 255));
+        OutputTab.setFont(new java.awt.Font("Cascadia Code", 0, 12)); // NOI18N
         jScrollPane3.setViewportView(OutputTab);
 
         OutputPane.addTab("Output", jScrollPane3);
 
+        jScrollPane4.setBackground(new java.awt.Color(102, 102, 0));
+        jScrollPane4.setBorder(null);
+
+        TerminalTab.setFont(new java.awt.Font("Cascadia Code", 0, 12)); // NOI18N
         jScrollPane4.setViewportView(TerminalTab);
 
         OutputPane.addTab("Terminal", jScrollPane4);
 
         VerticalSep1.setRightComponent(OutputPane);
 
+        EditorTabs.setBackground(new java.awt.Color(255, 255, 255));
         EditorTabs.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         EditorTabs.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        EditorTabs.setOpaque(true);
         EditorTabs.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 EditorTabsStateChanged(evt);
@@ -260,6 +287,10 @@ public class Coddit2 extends javax.swing.JFrame {
 
         HorizontalSep.setRightComponent(VerticalSep1);
 
+        FileTreeScroll.setBorder(null);
+
+        FileTree.setBackground(new java.awt.Color(234, 234, 234));
+        FileTree.setBorder(null);
         FileTree.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         FileTree.setModel(null);
         FileTreeScroll.setViewportView(FileTree);
@@ -268,9 +299,13 @@ public class Coddit2 extends javax.swing.JFrame {
 
         getContentPane().add(HorizontalSep, java.awt.BorderLayout.CENTER);
 
+        WindowMenu.setBackground(new java.awt.Color(212, 212, 212));
+        WindowMenu.setBorder(null);
         WindowMenu.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        WindowMenu.setName(""); // NOI18N
 
         FileMenu.setText("File");
+        FileMenu.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         NewFile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         NewFile.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
@@ -326,6 +361,7 @@ public class Coddit2 extends javax.swing.JFrame {
         WindowMenu.add(FileMenu);
 
         EditMenu.setText("Edit");
+        EditMenu.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         CopyText.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         CopyText.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
@@ -365,7 +401,9 @@ public class Coddit2 extends javax.swing.JFrame {
         WindowMenu.add(EditMenu);
 
         TASTEMenu.setText("TASTE");
+        TASTEMenu.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
+        FunErrCode.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         FunErrCode.setSelected(true);
         FunErrCode.setText("Fun Error Codes");
         TASTEMenu.add(FunErrCode);
@@ -497,9 +535,9 @@ public class Coddit2 extends javax.swing.JFrame {
                     try {
                         TASTE.RunResult result = get();
                         String output = result.getOutput();
-                        boolean success = !output.contains("❌") && !output.contains("Error");
+                        boolean success = !output.contains("⨯") && !output.contains("Error");
                         
-                        String header = success ? "✔ Execution Successful" : "✘ Execution Failed";
+                        String header = success ? "✔ Execution Successful" : "⨯ Execution Failed";
                         OutputTab.setText(header + "\n\n" + output);
                         
                     } catch (Exception ex) {
@@ -639,7 +677,28 @@ public class Coddit2 extends javax.swing.JFrame {
         SearchEngine.replaceAll(getCurrentTextArea(), SearchField.getText(), ReplaceField.getText());
     }
 
+    private javax.swing.Icon loadIcon(String name) {
+        try {
+            // Try file system first (Dev mode)
+            java.io.File f = new java.io.File("src/icons/" + name);
+            if (f.exists()) {
+                return new com.formdev.flatlaf.extras.FlatSVGIcon(f).derive(16, 16);
+            }
+            // Try classpath
+            return new com.formdev.flatlaf.extras.FlatSVGIcon("icons/" + name).derive(16, 16);
+        } catch (Exception e) {
+            System.err.println("Error loading icon " + name + ": " + e.getMessage());
+            return null;
+        }
+    }
+
     private void setupFileTree() {
+        FileTree.setShowsRootHandles(true);
+        
+        final javax.swing.Icon folderIcon = loadIcon("folder.svg");
+        final javax.swing.Icon fileIcon = loadIcon("file.svg");
+        final javax.swing.Icon sauceIcon = loadIcon("burger.svg");
+        
         FileTree.setCellRenderer(new javax.swing.tree.DefaultTreeCellRenderer() {
             @Override
             public java.awt.Component getTreeCellRendererComponent(javax.swing.JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -647,7 +706,18 @@ public class Coddit2 extends javax.swing.JFrame {
                 if (value instanceof javax.swing.tree.DefaultMutableTreeNode) {
                     Object userObject = ((javax.swing.tree.DefaultMutableTreeNode) value).getUserObject();
                     if (userObject instanceof java.io.File) {
-                        setText(((java.io.File) userObject).getName());
+                        java.io.File file = (java.io.File) userObject;
+                        setText(file.getName());
+                        
+                        if (file.isDirectory()) {
+                            if (folderIcon != null) setIcon(folderIcon);
+                        } else {
+                            if (file.getName().endsWith(".sauce") && sauceIcon != null) {
+                                setIcon(sauceIcon);
+                            } else if (fileIcon != null) {
+                                setIcon(fileIcon);
+                            }
+                        }
                     }
                 }
                 return this;
@@ -659,6 +729,8 @@ public class Coddit2 extends javax.swing.JFrame {
 
     private void updateFileTree(java.io.File folder) {
         this.currentProjectFolder = folder;
+        this.setTitle("Coddit - " + folder.getName());
+        
         javax.swing.tree.DefaultMutableTreeNode root = new javax.swing.tree.DefaultMutableTreeNode(folder);
         createTreeNodes(folder, root);
         FileTree.setModel(new javax.swing.tree.DefaultTreeModel(root));
@@ -888,7 +960,8 @@ public class Coddit2 extends javax.swing.JFrame {
     }
 
     private void createNewTab(String title, String content, java.io.File file) {
-        CodeEditor editor = new CodeEditor(content);
+        String fileName = (file != null) ? file.getName() : title;
+        CodeEditor editor = new CodeEditor(content, fileName);
         javax.swing.JTextPane textArea = editor.getTextPane();
         
         if (file != null) {
@@ -970,6 +1043,10 @@ public class Coddit2 extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        // Adjust DPI Scaling
+        System.setProperty("sun.java2d.uiScale", "1.75");
+        System.setProperty("sun.java2d.dpiaware", "true");
+        
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

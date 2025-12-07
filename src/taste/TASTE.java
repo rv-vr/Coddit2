@@ -31,14 +31,14 @@ public class TASTE {
         Map<String, Object> emptyVars = new HashMap<>();
         
         if (!file.getName().endsWith(".sauce")) {
-            return new RunResult("❌ INDIGESTION (Error): The chef only cooks with .sauce files!", emptyVars);
+            return new RunResult("⨯ INDIGESTION (Error): The chef only cooks with .sauce files!", emptyVars);
         }
 
         String sourceCode;
         try {
             sourceCode = new String(Files.readAllBytes(file.toPath()));
         } catch (IOException e) {
-            return new RunResult("❌ INDIGESTION (Error): Could not read the recipe.\n" + e.getMessage(), emptyVars);
+            return new RunResult("⨯ INDIGESTION (Error): Could not read the recipe.\n" + e.getMessage(), emptyVars);
         }
 
         if (sourceCode.trim().isEmpty()) {
@@ -64,7 +64,7 @@ public class TASTE {
             return new RunResult(resultBuilder.toString(), interpreter.getVariables());
 
         } catch (Exception ex) {
-            resultBuilder.append("\n❌ INDIGESTION (Error):\n").append(ex.getMessage());
+            resultBuilder.append("\n⨯ INDIGESTION (Error):\n").append(ex.getMessage());
             return new RunResult(resultBuilder.toString(), emptyVars);
         }
     }
