@@ -27,7 +27,7 @@ jobs:
       shell: cmd
       run: |
         cd dist
-        call native-image --no-fallback -cp "lib/*;Coddit2.jar" -jar Coddit2.jar ..\Coddit
+        call native-image --no-fallback -cp "..\lib\*;Coddit2.jar" -jar Coddit2.jar ..\Coddit
 
     - name: Upload Executable
       uses: actions/upload-artifact@v4
