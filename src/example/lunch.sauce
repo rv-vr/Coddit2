@@ -1,22 +1,11 @@
-Wrap mark = "Vincent"
-burp 10 - "Burger"
+Wrap name = ""
+burp "What is your name?"
+swallow name
 
-DEBUG: RunBar -> #273fbb
-DEBUG: HorizontalSep -> #b91c7a
-DEBUG: VerticalSep1 -> #e58d53
-DEBUG: EditorTabs -> #e179ae
-DEBUG: OutputPane -> #7fada6
-DEBUG: OutputTab -> #6ea0f1
-DEBUG: TerminalTab -> #a95e8c
-DEBUG: FileTree -> #88caa3
-DEBUG: FileTreeScroll -> #64f84c
-DEBUG: FileTreeScroll Viewport -> #6c950b
-DEBUG: jScrollPane1 -> #3187b3
-DEBUG: jScrollPane1 Viewport -> #836c63
-DEBUG: jScrollPane3 -> #e11bf0
-DEBUG: jScrollPane3 Viewport -> #36e9df
-DEBUG: jScrollPane4 -> #6d136a
-DEBUG: jScrollPane4 Viewport -> #288a03
-DEBUG: WindowMenu -> #51b0d9
-DEBUG: ContentPane -> #88a9ec
-e179ae
+chew name == "Chef" {
+    burp "Welcome back, Chef!"
+} nibble name == "Critic" {
+    burp "Oh no, hide the sauce!"
+} spit {
+    burp "Hello, ", name
+}

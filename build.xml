@@ -70,4 +70,20 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+    <property name="store.jar.name" value="${application.title}-fat.jar"/>
+
+    <jar destfile="${dist.dir}/${store.jar.name}">
+        
+        <zipfileset src="${dist.jar}" excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
+
+        <zipgroupfileset dir="${dist.dir}/lib" includes="*.jar" excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
+
+        <manifest>
+            <attribute name="Main-Class" value="${main.class}"/>
+        </manifest>
+    </jar>
+    
+    <echo level="info">Fat JAR created: ${dist.dir}/${store.jar.name}</echo>
+    </target>
 </project>
