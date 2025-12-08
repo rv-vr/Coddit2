@@ -1,0 +1,36 @@
+name: GraalVM Native Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up GraalVM
+      uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '21'
+        distribution: 'graalvm'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build JAR with Ant
+      run: ant jar
+
+    - name: Build Native Image
+      shell: cmd
+      run: |
+        cd dist
+        call native-image --no-fallback -jar Coddit2.jar ..\Coddit
+
+    - name: Upload Executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: Coddit-Windows-Exe
+        path: Coddit.exe
