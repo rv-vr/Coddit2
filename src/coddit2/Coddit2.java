@@ -168,8 +168,6 @@ public class Coddit2 extends JFrame {
         OutputPane = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         OutputTab = new javax.swing.JEditorPane();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        TerminalTab = new javax.swing.JEditorPane();
         EditorTabs = new javax.swing.JTabbedPane();
         FileTreeScroll = new javax.swing.JScrollPane();
         FileTree = new javax.swing.JTree();
@@ -280,14 +278,6 @@ public class Coddit2 extends JFrame {
         jScrollPane3.setViewportView(OutputTab);
 
         OutputPane.addTab("Output", jScrollPane3);
-
-        jScrollPane4.setBackground(new java.awt.Color(102, 102, 0));
-        jScrollPane4.setBorder(null);
-
-        TerminalTab.setFont(new java.awt.Font("Cascadia Code", 0, 12)); // NOI18N
-        jScrollPane4.setViewportView(TerminalTab);
-
-        OutputPane.addTab("Terminal", jScrollPane4);
 
         VerticalSep1.setRightComponent(OutputPane);
 
@@ -704,14 +694,12 @@ public class Coddit2 extends JFrame {
     private javax.swing.JMenuItem SaveFileAs;
     private javax.swing.JButton StopCode;
     private javax.swing.JMenu TASTEMenu;
-    private javax.swing.JEditorPane TerminalTab;
     private javax.swing.JSplitPane VerticalSep1;
     private javax.swing.JMenuBar WindowMenu;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;

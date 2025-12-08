@@ -71,9 +71,9 @@ burp("--- PHASE 3 COMPLETE ---")
 // burp(spaghetti)
 
 // Test 2: Division by Zero
-Slurp chaos = 7
-Slurp boon = 7 / 2
-burp boon
+Slurp chaos = (50 * 12) / 25 + 34 - 18
+burp chaos
+
 
 // Test 3: Type Mismatch (Math with Text)
 // Chunk weird = 10 - "Sandwich"
