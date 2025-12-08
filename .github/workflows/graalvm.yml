@@ -36,15 +36,40 @@ jobs:
         Copy-Item "$env:JAVA_HOME\bin\awt.dll" -Destination .
         Copy-Item "$env:JAVA_HOME\bin\java.dll" -Destination .
         Copy-Item "$env:JAVA_HOME\bin\fontmanager.dll" -Destination .
+        # jvm.dll is required because java.dll forwards calls to it
+        if (Test-Path "$env:JAVA_HOME\bin\server\jvm.dll") {
+            Copy-Item "$env:JAVA_HOME\bin\server\jvm.dll" -Destination .
+        }
+        # verify.dll is often needed
+        if (Test-Path "$env:JAVA_HOME\bin\verify.dll") {
+            Copy-Item "$env:JAVA_HOME\bin\verify.dll" -Destination .
+        }
         # Copy javajpeg if it exists, ignore if not
         if (Test-Path "$env:JAVA_HOME\bin\javajpeg.dll") {
           Copy-Item "$env:JAVA_HOME\bin\javajpeg.dll" -Destination .
         }
 
+    - name: Create Single EXE (SFX)
+      shell: powershell
+      run: |
+        # 1. Download 7-Zip Extra to get the 7zSD.sfx (Standalone Installer Module)
+        Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z2301-extra.7z" -OutFile "7z-extra.7z"
+        7z x 7z-extra.7z -o7z-extra
+        
+        # 2. Create a 7z archive containing the EXE and all DLLs
+        7z a app.7z Coddit.exe *.dll
+        
+        # 3. Create the config file for the SFX
+        # This tells the SFX to run Coddit.exe after extracting
+        $config = ';!@Install@!UTF-8!' + "`r`n" + 'Title="Coddit"' + "`r`n" + 'RunProgram="Coddit.exe"' + "`r`n" + ';!@InstallEnd@!'
+        $config | Out-File -Encoding UTF8 -FilePath config.txt
+        
+        # 4. Combine the SFX module, config, and archive into one EXE
+        # We use cmd /c copy /b for safe binary concatenation
+        cmd /c copy /b 7z-extra\x64\7zsd.sfx + config.txt + app.7z Coddit-Standalone.exe
+
     - name: Upload Executable
       uses: actions/upload-artifact@v4
       with:
         name: Coddit-Windows-Exe
-        path: |
-          Coddit.exe
-          *.dll
+        path: Coddit-Standalone.exe
