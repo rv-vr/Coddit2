@@ -49,40 +49,10 @@ jobs:
           Copy-Item "$env:JAVA_HOME\bin\javajpeg.dll" -Destination .
         }
 
-    - name: Create Single EXE (SFX)
-      shell: powershell
-      run: |
-        # 1. Download 7-Zip Extra to get the 7zSD.sfx (Standalone Installer Module)
-        Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z2301-extra.7z" -OutFile "7z-extra.7z"
-        7z x 7z-extra.7z -o7z-extra
-        
-        # Debug: List extracted files to see structure
-        Write-Host "Listing extracted files in 7z-extra:"
-        Get-ChildItem -Path 7z-extra -Recurse | Select-Object FullName
-        
-        # 2. Create a 7z archive containing the EXE and all DLLs
-        7z a app.7z Coddit.exe *.dll
-        
-        # 3. Create the config file for the SFX
-        # This tells the SFX to run Coddit.exe after extracting
-        $config = ';!@Install@!UTF-8!' + "`r`n" + 'Title="Coddit"' + "`r`n" + 'RunProgram="Coddit.exe"' + "`r`n" + ';!@InstallEnd@!'
-        $config | Out-File -Encoding UTF8 -FilePath config.txt
-        
-        # 4. Find the SFX module dynamically
-        $sfx = Get-ChildItem -Path 7z-extra -Recurse -Filter "7zsd.sfx" | Select-Object -First 1
-        
-        if ($sfx) {
-            Write-Host "Found SFX module at: $($sfx.FullName)"
-            # 5. Combine the SFX module, config, and archive into one EXE
-            # We use cmd /c copy /b for safe binary concatenation
-            cmd /c copy /b "$($sfx.FullName)" + config.txt + app.7z Coddit-Standalone.exe
-        } else {
-            Write-Error "Could not find 7zsd.sfx in extracted folder"
-            exit 1
-        }
-
     - name: Upload Executable
       uses: actions/upload-artifact@v4
       with:
         name: Coddit-Windows-Exe
-        path: Coddit-Standalone.exe
+        path: |
+          Coddit.exe
+          *.dll
