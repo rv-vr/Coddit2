@@ -30,8 +30,21 @@ jobs:
         # -J-Djava.awt.headless=false ensures AWT is included
         native-image "-J-Djava.awt.headless=false" --no-fallback -cp "dist\Coddit2.jar;lib\*" -o Coddit coddit2.Coddit2
 
+    - name: Copy AWT DLLs
+      shell: powershell
+      run: |
+        Copy-Item "$env:JAVA_HOME\bin\awt.dll" -Destination .
+        Copy-Item "$env:JAVA_HOME\bin\java.dll" -Destination .
+        Copy-Item "$env:JAVA_HOME\bin\fontmanager.dll" -Destination .
+        # Copy javajpeg if it exists, ignore if not
+        if (Test-Path "$env:JAVA_HOME\bin\javajpeg.dll") {
+          Copy-Item "$env:JAVA_HOME\bin\javajpeg.dll" -Destination .
+        }
+
     - name: Upload Executable
       uses: actions/upload-artifact@v4
       with:
         name: Coddit-Windows-Exe
-        path: Coddit.exe
+        path: |
+          Coddit.exe
+          *.dll
