@@ -66,7 +66,16 @@ jobs:
         
         # 4. Combine the SFX module, config, and archive into one EXE
         # We use cmd /c copy /b for safe binary concatenation
-        cmd /c copy /b 7z-extra\x64\7zsd.sfx + config.txt + app.7z Coddit-Standalone.exe
+        # Note: 7zSD.sfx is usually in the root or x64 subfolder depending on the archive structure
+        if (Test-Path "7z-extra\x64\7zsd.sfx") {
+            cmd /c copy /b 7z-extra\x64\7zsd.sfx + config.txt + app.7z Coddit-Standalone.exe
+        } elseif (Test-Path "7z-extra\7zsd.sfx") {
+            cmd /c copy /b 7z-extra\7zsd.sfx + config.txt + app.7z Coddit-Standalone.exe
+        } else {
+            Write-Error "Could not find 7zsd.sfx in extracted folder"
+            Get-ChildItem -Recurse 7z-extra
+            exit 1
+        }
 
     - name: Upload Executable
       uses: actions/upload-artifact@v4
