@@ -28,7 +28,7 @@ jobs:
       run: |
         # Use explicit classpath with main class instead of -jar
         # -J-Djava.awt.headless=false ensures AWT is included
-        native-image --no-fallback -J-Djava.awt.headless=false -cp "dist\Coddit2.jar;lib\*" coddit2.Coddit2 Coddit
+        native-image --no-fallback -J-Djava.awt.headless=false -cp "dist\Coddit2.jar;lib\*" coddit2.Coddit2 .\Coddit
 
     - name: Upload Executable
       uses: actions/upload-artifact@v4
