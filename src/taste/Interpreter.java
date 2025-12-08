@@ -377,11 +377,7 @@ public class Interpreter {
                 return ((Number) left).doubleValue() * ((Number) right).doubleValue();
             }
         } else if (op == TokenType.OP_DIV) {
-            if (left instanceof Integer && right instanceof Integer) {
-                return (Integer) left / (Integer) right;
-            } else {
-                return ((Number) left).doubleValue() / ((Number) right).doubleValue();
-            }
+            return ((Number) left).doubleValue() / ((Number) right).doubleValue();
         } else {
             if (left instanceof Integer && right instanceof Integer) {
                 return (Integer) left % (Integer) right;
