@@ -7,7 +7,7 @@ build/
 dist/
 nbdist/
 .nb-gradle/
-.github/
+.github/instructions/
 
 # Package Files
 *.jar
