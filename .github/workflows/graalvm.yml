@@ -48,6 +48,27 @@ jobs:
         if (Test-Path "$env:JAVA_HOME\bin\javajpeg.dll") {
           Copy-Item "$env:JAVA_HOME\bin\javajpeg.dll" -Destination .
         }
+        # Copy freetype if it exists
+        if (Test-Path "$env:JAVA_HOME\bin\freetype.dll") {
+          Copy-Item "$env:JAVA_HOME\bin\freetype.dll" -Destination .
+        }
+
+    - name: Copy Font Configuration
+      shell: powershell
+      run: |
+        # Create lib directory
+        New-Item -ItemType Directory -Force -Path lib
+        
+        # Copy fontconfig properties from lib
+        $fontConfig = Get-ChildItem "$env:JAVA_HOME\lib\fontconfig.*" -ErrorAction SilentlyContinue
+        if ($fontConfig) {
+            $fontConfig | Copy-Item -Destination lib\
+        }
+
+        # Copy conf directory if exists (contains fonts config in newer Java)
+        if (Test-Path "$env:JAVA_HOME\conf") {
+            Copy-Item "$env:JAVA_HOME\conf" -Destination . -Recurse
+        }
 
     - name: Upload Executable
       uses: actions/upload-artifact@v4
@@ -56,3 +77,5 @@ jobs:
         path: |
           Coddit.exe
           *.dll
+          lib/
+          conf/
