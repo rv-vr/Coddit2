@@ -24,8 +24,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -41,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.UndoManager;
 
@@ -631,32 +628,14 @@ public class Coddit2 extends JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        // Fix for Native Image on Windows: java.home is required for FontConfiguration
+        if (System.getProperty("java.home") == null) {
+            System.setProperty("java.home", new File(".").getAbsolutePath());
+        }
+
         // Adjust DPI Scaling
         System.setProperty("sun.java2d.uiScale", "1.75");
         System.setProperty("sun.java2d.dpiaware", "true");
-        
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(Coddit2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
         
         FlatLightLaf.setup();
         
